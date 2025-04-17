@@ -4,7 +4,7 @@ const { addToCart, clearCart, deleteCartItem, getCart, updateCartItem} = require
 router.get('/:userId', getCart)
 router.post('/add', addToCart)
 router.put('update/:itemId', updateCartItem)
-router.delete('delete/:itemId', deleteCartItem)
+router.delete('delete/cartItem', deleteCartItem)
 router.delete('clear', clearCart)
 
 module.exports = router;

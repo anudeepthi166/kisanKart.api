@@ -24,8 +24,8 @@ module.exports = (sequelize, DataTypes) => {
   // If you want to define associations in future:
   Product.associate = function(models) {
     // associations can be defined here
-    // Product.hasMany(models.CartItem);
-    // Product.hasMany(models.OrderItem);
+    Product.hasMany(models.CartItem);
+    Product.hasMany(models.OrderItem);
   };
 
   return Product;

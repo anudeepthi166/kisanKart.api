@@ -7,7 +7,9 @@ const { verifyOTP } = require('./otpController')
 exports.signup = asyncHandler(async(req, res) =>{
     console.log("req.body", req.body)
     const {name, email, password, contact} = req.body.values;
-    const user = await User.create({name,email,password,contact})
+    let user = await User.create({name,email,password,contact})
+    user = user.get({plain:true})
+    delete user.password
     res.status(200).json({
         message: "User registered successfully",
         user: user
@@ -20,7 +22,7 @@ exports.login = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "Contact is required" });
     }
 
-    const user = await User.findOne({ where: { contact } });
+    let user = await User.findOne({ where: { contact } });
     if (!user) {
         return res.status(404).json({ message: "User not found" });
     }
@@ -38,7 +40,8 @@ exports.login = asyncHandler(async (req, res) => {
     } else {
         return res.status(400).json({ message: "Provide either password or otp" });
     }
-
+    user = user.get({plain:true})
+    delete user.password
     res.status(200).json({
         message: "User logged in successfully",
         user: user

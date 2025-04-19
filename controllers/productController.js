@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler")
-const {Product} = require('../models')
+const {Product} = require('../models');
+const cloudinary = require('../utils/cloudinary')
+const fs = require('fs')
 exports.getAllProducts = asyncHandler(async(req,res) =>{
     console.log('getAllProducts')
     try {
@@ -21,11 +23,34 @@ exports.getAllProducts = asyncHandler(async(req,res) =>{
           res.status(500).json({ message: 'Error fetching products', error: error.message });
         }
 });
+exports.getProductById = asyncHandler(async(req, res)=>{
+  const {productId} = req.params
+  try {
+    const products = await Product.findOne({where:{
+      id: productId
+    }});
+    res.status(200).json({
+        products: products
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching products', error: error.message });
+    }
+
+})
 exports.addProduct = asyncHandler(async(req,res) =>{
-    const { name, description, price, stock, category, imageUrl } = req.body;
+    const { name, description, price, stock, category } = req.body;
     console.log(req.body)
     if (!name || !price || stock === undefined) {
     return res.status(400).json({ message: 'Name, price, and stock are required fields.' });
+    }
+    //Upload image to cloudinary
+    let imageUrl = ''
+    if(req.file){
+      const res = await  cloudinary.uploader.upload(req.file.path,{
+        folder: 'kisanKart_Products'
+      })
+      imageUrl = res.secure_url
+      fs.unlinkSync(req.file.path)
     }
 
     const newProduct = await Product.create({

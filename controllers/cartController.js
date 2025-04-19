@@ -1,8 +1,7 @@
 const asyncHandler = require('express-async-handler')
-const {Cart, CartItem} = require('../models')
+const {Cart, CartItem, Product} = require('../models')
 exports.getCart = asyncHandler(async(req, res)=>{
-    const { userId } = req.params; // Assuming you're sending userId as a route parameter
-
+    const { userId } = req.params;
     if (!userId) {
         return res.status(400).json({ message: 'userId is required.' });
     }
@@ -16,13 +15,14 @@ exports.getCart = asyncHandler(async(req, res)=>{
     });
 
     if (!cart) {
-        return res.status(404).json({ message: 'Cart not found.' });
+        return res.status(404).json({ message: 'Cart not found for this user.' });
     }
 
     res.status(200).json({
         cartId: cart.id,
         userId: cart.userId,
         items: cart.CartItems.map(item => ({
+            itemId: item.id,
             productId: item.productId,
             productName: item.Product?.name, 
             quantity: item.quantity
@@ -94,7 +94,7 @@ exports.updateCartItem = asyncHandler(async(req, res)=>{
     res.status(200).json({ message: 'Cart item updated successfully.' });
 });
 exports.deleteCartItem = asyncHandler(async(req, res)=>{    
-    const { userId, productId } = req.params; 
+    const { userId, productId } = req.body; 
     if (!userId || !productId) {
         return res.status(400).json({ message: 'userId and productId are required.' });
     }

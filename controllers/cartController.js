@@ -17,14 +17,14 @@ exports.getCart = asyncHandler(async(req, res)=>{
     if (!cart) {
         return res.status(404).json({ message: 'Cart not found for this user.' });
     }
-
+    console.log(cart)
     res.status(200).json({
         cartId: cart.id,
         userId: cart.userId,
         items: cart.CartItems.map(item => ({
             itemId: item.id,
-            productId: item.productId,
-            productName: item.Product?.name, 
+
+            product: item.Product, 
             quantity: item.quantity
         }))
     });
@@ -93,8 +93,11 @@ exports.updateCartItem = asyncHandler(async(req, res)=>{
 
     res.status(200).json({ message: 'Cart item updated successfully.' });
 });
-exports.deleteCartItem = asyncHandler(async(req, res)=>{    
-    const { userId, productId } = req.body; 
+
+exports.deleteCartItem = asyncHandler(async(req, res)=>{ 
+    console.log(req.params)   
+    const { userId, productId } = req.params; 
+
     if (!userId || !productId) {
         return res.status(400).json({ message: 'userId and productId are required.' });
     }

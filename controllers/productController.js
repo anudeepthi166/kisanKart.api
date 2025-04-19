@@ -23,6 +23,20 @@ exports.getAllProducts = asyncHandler(async(req,res) =>{
           res.status(500).json({ message: 'Error fetching products', error: error.message });
         }
 });
+exports.getProductById = asyncHandler(async(req, res)=>{
+  const {productId} = req.params
+  try {
+    const products = await Product.findOne({where:{
+      id: productId
+    }});
+    res.status(200).json({
+        products: products
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching products', error: error.message });
+    }
+
+})
 exports.addProduct = asyncHandler(async(req,res) =>{
     const { name, description, price, stock, category } = req.body;
     console.log(req.body)

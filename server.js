@@ -4,6 +4,7 @@ const otpRoutes = require('./routes/otpRoutes')
 const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
 const orderRoutes = require('./routes/orderRoutes')
+const userRoutes = require('./routes/userRoutes')
 const db = require('./models');
 const cors = require('cors')
 require('dotenv').config()
@@ -22,6 +23,7 @@ const startServer = async() =>{
         app.use('/api/product', productRoutes)
         app.use('/api/cart', cartRoutes)
         app.use('/api/order', orderRoutes)
+        app.use('/api/user', userRoutes)
 
         app.listen(PORT, () => {
             console.log(`Server running on PORT: ${PORT}`);

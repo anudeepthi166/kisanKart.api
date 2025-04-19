@@ -2,27 +2,40 @@ const asyncHandler = require("express-async-handler")
 const {Product} = require('../models');
 const cloudinary = require('../utils/cloudinary')
 const fs = require('fs')
-exports.getAllProducts = asyncHandler(async(req,res) =>{
-    console.log('getAllProducts')
-    try {
-        const products = await Product.findAll();
+exports.getAllProducts = asyncHandler(async (req, res) => {
+  console.log('getAllProducts');
+  try {
+    const products = await Product.findAll();
     
-        const groupedProducts = {};
+    // Check for the flag in the request (e.g., req.query or req.body)
+    const { categoryFlag } = req.query; // Assuming the flag is passed as a query parameter
     
-        products.forEach(product => {
-          const category = product.category || 'Uncategorized';
-          if (!groupedProducts[category]) {
-            groupedProducts[category] = [];
-          }
-          groupedProducts[category].push(product);
-        });
-        res.status(200).json({
-            products: groupedProducts
-          });
-        } catch (error) {
-          res.status(500).json({ message: 'Error fetching products', error: error.message });
+    if (categoryFlag) {
+      // Group products by category if the flag is set
+      const groupedProducts = {};
+      
+      products.forEach(product => {
+        const category = product.category || 'Uncategorized';
+        if (!groupedProducts[category]) {
+          groupedProducts[category] = [];
         }
+        groupedProducts[category].push(product);
+      });
+
+      return res.status(200).json({
+        products: groupedProducts
+      });
+    }
+    
+    // Return all products if no category flag is provided
+    return res.status(200).json({
+      products: products
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching products', error: error.message });
+  }
 });
+
 exports.getProductById = asyncHandler(async(req, res)=>{
   const {productId} = req.params
   try {

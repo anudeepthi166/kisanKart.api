@@ -65,7 +65,7 @@ exports.createOrder = asyncHandler(async(req, res)=> {
         const order = await Order.create({
             userId,
             totalAmount,
-            status: 'Pending' 
+            status: 'Ordered' 
         }, { transaction });
 
         const orderItemsData = items.map(item => ({

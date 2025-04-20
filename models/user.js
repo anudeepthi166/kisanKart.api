@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.hasMany(models.Order);
+      User.belongsTo(models.Role); 
     }
   }
   User.init({
@@ -50,6 +51,13 @@ module.exports = (sequelize, DataTypes) => {
           args: [10, 10],
           msg: "Contact number should contain 10 digits"
         }
+      }
+    },
+    roleId: {
+      type: DataTypes.NUMBER,
+      allowNull: false,
+      validate:{
+        notNull: { msg: "role is required" },
       }
     }
   }, {

@@ -1,7 +1,9 @@
+const { where } = require('sequelize');
 const { Address } = require('../models'); // adjust path based on your project structure
 const asyncHandler = require('express-async-handler');
 
 exports.addUserAddress = asyncHandler(async (req, res) => {
+  console.log(req.body)
     const {
       userId,
       fullName,
@@ -67,7 +69,7 @@ exports.getUserAddress = asyncHandler(async (req, res) => {
 });
 
 exports.updateUserAddress = asyncHandler(async (req, res) => {
-    const { addressId } = req.params;
+    const { userId } = req.params;
     const {
       fullName,
       phoneNumber,
@@ -80,7 +82,9 @@ exports.updateUserAddress = asyncHandler(async (req, res) => {
     } = req.body;
   
     // Find the address by ID
-    const address = await Address.findByPk(addressId);
+    const address = await Address.findOne({where:{
+      userId: userId
+    }});
   
     if (!address) {
       return res.status(404).json({ message: 'Address not found' });

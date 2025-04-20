@@ -4,6 +4,6 @@ const router = express.Router();
 
 router.post('/address', addUserAddress)
 router.get('/address/:userId', getUserAddress)
-router.put('/address/:addressId', updateUserAddress)
+router.put('/address/:userId', updateUserAddress)
 
 module.exports = router;

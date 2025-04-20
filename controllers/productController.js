@@ -8,20 +8,14 @@ exports.getAllProducts = asyncHandler(async (req, res) => {
     const products = await Product.findAll();
     
     // Check for the flag in the request (e.g., req.query or req.body)
-    const { categoryFlag } = req.query; // Assuming the flag is passed as a query parameter
-    
-    if (categoryFlag) {
-      // Group products by category if the flag is set
-      const groupedProducts = {};
-      
-      products.forEach(product => {
-        const category = product.category || 'Uncategorized';
-        if (!groupedProducts[category]) {
-          groupedProducts[category] = [];
-        }
-        groupedProducts[category].push(product);
-      });
+    const { category } = req.query; // Assuming the flag is passed as a query parameter
+    console.log('category falg', category)
+    console.log(products)
 
+    if (category) {
+      // Group products by category if the flag is set
+      const groupedProducts = products.filter((product)=>product.category.toLowerCase() === category.toLowerCase())
+      console.log('grouped', groupedProducts)
       return res.status(200).json({
         products: groupedProducts
       });

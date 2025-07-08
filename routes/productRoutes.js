@@ -5,8 +5,8 @@ const upload = require("../utils/multer");
 
 router.post('/', upload.single('image'),addProduct);
 router.get('/', getAllProducts);
+router.get('/search', searchProducts)
 router.get('/:productId', getProductById)
-router.get('/search/:category/:name', searchProducts)
 router.put('/:id', updateProduct);
 router.delete('/:id', deleteProduct);
 

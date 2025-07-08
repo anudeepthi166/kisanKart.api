@@ -1,7 +1,9 @@
 const asyncHandler = require("express-async-handler")
-const {Product} = require('../models');
+const {Product, sequelize} = require('../models');
 const cloudinary = require('../utils/cloudinary')
-const fs = require('fs')
+const fs = require('fs');
+const { type } = require("os");
+const { Sequelize } = require("sequelize");
 
 exports.getAllProducts = asyncHandler(async (req, res) => {
   console.log('getAllProducts');
@@ -32,10 +34,39 @@ exports.getAllProducts = asyncHandler(async (req, res) => {
 });
 
 exports.searchProducts = asyncHandler(async(req,res)=>{
-  console.log('Search products')
+  try{
+    const {category, productName} = req.query
+    let query = `SELECT * FROM products WHERE 1=1`
+    const replacements = {}
+    if(category && category!=='null'){
+      console.log("category:",  category)
+      query += ` AND category like :category `
+      replacements.category = `%${category }%`
+    }
+    if(productName){
+      console.log("productName:",  productName)
+      query+= ` AND name like :productName`
+      replacements.productName = `%${productName}%`
+      
+    }
+    const products =  await sequelize.query(query,{
+      replacements,
+      type: sequelize.QueryTypes.SELECT
+    })
+    // console.log(products)
+    res.status(200).json({
+      messsage:'searched for products',
+      toatl: products.length,
+      products: products
+    })
+  }catch(err){
+    console.log(`err while getting products based on search`,err)
+  }
+
 })
 
 exports.getProductById = asyncHandler(async(req, res)=>{
+  console.log('getproductById')
   const {productId} = req.params
   try {
     const products = await Product.findOne({where:{

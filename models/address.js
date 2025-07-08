@@ -13,11 +13,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    addressLine1: {
+    address: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    addressLine2: {
+    landmark: {
       type: DataTypes.STRING,
       allowNull: true
     },
@@ -33,11 +33,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    country: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'India'
-    }
+    isSelected: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false  ,
+      defaultValue: false,
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false  ,
+      defaultValue: false,
+    },
+   
   }, {
     tableName: 'Addresses'
   });

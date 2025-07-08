@@ -3,49 +3,41 @@ const { Address } = require('../models'); // adjust path based on your project s
 const asyncHandler = require('express-async-handler');
 
 exports.addUserAddress = asyncHandler(async (req, res) => {
-  console.log(req.body)
     try{
       const {
       userId,
       fullName,
       phoneNumber,
-      addressLine1,
-      addressLine2,
+      address,
+      landmark,
       city,
       state,
       postalCode,
-      country
       } = req.body;
     
       // Basic validation
-      if (!userId || !fullName || !phoneNumber || !addressLine1 || !city || !state || !postalCode) {
+      if (!userId || !fullName || !phoneNumber || !address|| !landmark || !city || !state || !postalCode) {
         return res.status(400).json({ message: 'All required address fields must be provided' });
       }
     
-      // Check if address already exists for this user (optional)
-      const existingAddress = await Address.findOne({ where: { userId } });
-      if (existingAddress) {
-        return res.status(400).json({ message: 'Address already exists for this user' });
-      }
-    
       // Create new address
-      const address = await Address.create({
+      const userAddress = await Address.create({
         userId,
         fullName,
         phoneNumber,
-        addressLine1,
-        addressLine2,
+        address,
+        landmark,
         city,
         state,
         postalCode,
-        country: country || 'India' // default to India if not provided
       });
     
       res.status(201).json({
         message: 'Address added successfully',
-        address
+        userAddress
       });
     }catch(err){
+      console.log(err)
       res.status(500).json({
           message: "Error while adding user address",
       });
@@ -61,11 +53,13 @@ exports.getUserAddress = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: 'User ID is required' });
     }
 
-    const address = await Address.findOne({
-      where: { userId: userId },
+    const address = await Address.findAll({
+      where: { 
+        userId: userId,
+        isDeleted: false },
     });
 
-    if (!address) {
+    if (address && !address.length) {
       return res.status(404).json({ message: 'Address not found for this user' });
     }
 
@@ -74,54 +68,103 @@ exports.getUserAddress = asyncHandler(async (req, res) => {
       address
     });
   }catch(err){
+    console.log(err)
     res.status(500).json({
         message: "Error while getting user address",
     });
 }
 });
 
+exports.updateDeliveryAddress = asyncHandler(async(req, res)=>{
+  const {userId, addressId} = req.params
+  console.log(userId, addressId)
+  try{
+    const address = await Address.findAll({
+      where:{
+        userId
+      }
+    })
+    for(const add of address){
+      if(add.id == addressId){
+        console.log("matched")
+        add.isSelected = true
+      }
+      else{
+        add.isSelected = false
+      }
+      await add.save()
+    } 
+    res.status(200).json({
+      message: "Updated delivery address"
+    }
+
+    )
+  }
+  catch(err){
+    console.log("Error while updating the delivery address", err)
+  }
+})
+
 exports.updateUserAddress = asyncHandler(async (req, res) => {
-    const { userId } = req.params;
+  const addressId = req.params.addressId
+
+    console.log(req.body, addressId)
     try{
       const {
       fullName,
       phoneNumber,
-      addressLine1,
-      addressLine2,
+      address,
+      landmark,
       city,
       state,
       postalCode,
-      country
       } = req.body;
     
       // Find the address by ID
-      const address = await Address.findOne({where:{
-        userId: userId
+      const userAddress = await Address.findOne({where:{
+        id: addressId
       }});
+      console.log(userAddress)
     
-      if (!address) {
+      if (!userAddress) {
         return res.status(404).json({ message: 'Address not found' });
       }
     
       // Update fields
-      address.fullName = fullName || address.fullName;
-      address.phoneNumber = phoneNumber || address.phoneNumber;
-      address.addressLine1 = addressLine1 || address.addressLine1;
-      address.addressLine2 = addressLine2 || address.addressLine2;
-      address.city = city || address.city;
-      address.state = state || address.state;
-      address.postalCode = postalCode || address.postalCode;
-      address.country = country || address.country;
+      userAddress.fullName = fullName 
+      userAddress.phoneNumber = phoneNumber 
+      userAddress.address = address 
+      userAddress.landmark = landmark 
+      userAddress.city = city 
+      userAddress.state = state 
+      userAddress.postalCode = postalCode
+      console.log(userAddress)
     
-      await address.save();
+      await userAddress.save();
     
       res.status(200).json({
         message: 'Address updated successfully',
         address
       });
     }catch(err){
+      console.log(err)
       res.status(500).json({
           message: "Error while updating user address",
       });
   }
   });
+
+exports.deleteUserAddress = asyncHandler(async(req,res)=>{
+  try{
+   const { addressId } = req.params
+   const address = await Address.findOne({where: {id: addressId}})
+   address.isDeleted = true
+   await address.save()
+    res.status(200).json({
+      message: "Address deleted"
+    })
+  }
+  catch(err){
+    console.log("Error while deleting address", err)
+  }
+})
